@@ -11,20 +11,31 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.virpalsinhchavda.cp_1_chatnexus.databinding.ActivityMainBinding
+import com.virpalsinhchavda.cp_1_chatnexus.databinding.ActivityVerificationBinding
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var button: Button
     private lateinit var sharedPreferences: SharedPreferences
-    lateinit var logout : Button
+    private lateinit var auth: FirebaseAuth
+    private lateinit var binding : ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+
         sharedPreferences = getSharedPreferences("login_state", Context.MODE_PRIVATE)
         val isLoggedIn = sharedPreferences.getBoolean("isLoggedIn", false)
         if (!isLoggedIn) {
             startphone()
         }
-        setContentView(R.layout.activity_main)
-        logout = findViewById(R.id.logout)
-        logout.setOnClickListener {
+        setContentView(view)
+        button = findViewById(R.id.logout)
+        auth = FirebaseAuth.getInstance()
+
+        button.setOnClickListener {
+                auth.signOut()
                 logout()
         }
     }

@@ -36,7 +36,7 @@
 
     <EditText
         android:id="@+id/editTextnumber"
-        android:layout_width="350dp"
+        android:layout_width="320dp"
         android:layout_height="55dp"
         android:layout_marginTop="56dp"
         android:hint="Enter your number"
@@ -44,6 +44,7 @@
         android:textColor="@color/black"
         android:inputType="number"
         android:maxLength="13"
+        android:textColorHint="@color/black"
         android:minEms="13"
         android:paddingLeft="20dp"
         android:background="@drawable/rounded_edittext_background"

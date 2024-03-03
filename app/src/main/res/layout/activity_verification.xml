@@ -45,6 +45,7 @@
         android:gravity="center"
         android:textColor="@android:color/black"
         android:background="@drawable/rounded_edittext_background"
+        android:maxLength="1"
         />
     <EditText
         android:id='@+id/OTP2'
@@ -58,6 +59,7 @@
         android:gravity="center"
         android:textColor="@android:color/black"
         android:background="@drawable/rounded_edittext_background"
+        android:maxLength="1"
         />
     <EditText
         android:id='@+id/OTP3'
@@ -71,6 +73,7 @@
         android:gravity="center"
         android:textColor="@android:color/black"
         android:background="@drawable/rounded_edittext_background"
+        android:maxLength="1"
         />
     <EditText
         android:id='@+id/OTP4'
@@ -84,6 +87,7 @@
         android:gravity="center"
         android:textColor="@android:color/black"
         android:background="@drawable/rounded_edittext_background"
+        android:maxLength="1"
         />
     <EditText
         android:id="@+id/OTP5"
@@ -97,6 +101,7 @@
         android:gravity="center"
         android:textColor="@android:color/black"
         android:background="@drawable/rounded_edittext_background"
+        android:maxLength="1"
         />
     <EditText
         android:id="@+id/OTP6"
@@ -110,6 +115,7 @@
         android:gravity="center"
         android:textColor="@android:color/black"
         android:background="@drawable/rounded_edittext_background"
+        android:maxLength="1"
         />
     <Button
         android:id="@+id/OTPverification"
