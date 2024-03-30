@@ -1,33 +1,13 @@
 {
   "project_info": {
-    "project_number": "376615683875",
-    "firebase_url": "https://chatnexus-3b7b2-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "chatnexus-3b7b2",
-    "storage_bucket": "chatnexus-3b7b2.appspot.com"
+    "project_number": "515309113636",
+    "project_id": "chatnexus-f3f12",
+    "storage_bucket": "chatnexus-f3f12.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:376615683875:android:e501718f455c3f3bcfae96",
-        "android_client_info": {
-          "package_name": "com.virpalsinhchavda.chatnexus"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDW7G5Gl1WsSPX5cjvzr0COGDVaibpGjLw"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:376615683875:android:90bb4813bafe22ebcfae96",
+        "mobilesdk_app_id": "1:515309113636:android:764bb8af008374984ea3b1",
         "android_client_info": {
           "package_name": "com.virpalsinhchavda.cp_1_chatnexus"
         }
@@ -35,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDW7G5Gl1WsSPX5cjvzr0COGDVaibpGjLw"
+          "current_key": "AIzaSyAF80RdwIRjiTFZT1v66KXb6Q8LfbjJomU"
         }
       ],
       "services": {

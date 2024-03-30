@@ -23,43 +23,91 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Sign Up"
+        android:text="Sign in"
         android:textColor="@android:color/white"
-        android:textSize="24sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.462"
+        app:layout_constraintHorizontal_bias="0.471"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.422" />
+        app:layout_constraintVertical_bias="0.316" />
 
-    <EditText
-        android:id="@+id/editTextnumber"
-        android:layout_width="320dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="56dp"
-        android:hint="Enter your number"
-        app:prefixText="+91"
-        android:textColor="@color/black"
-        android:inputType="number"
-        android:maxLength="13"
-        android:textColorHint="@color/black"
-        android:minEms="13"
-        android:paddingLeft="20dp"
-        android:background="@drawable/rounded_edittext_background"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/signup" />
-
-    <Button
-        android:id="@+id/buttonContinue"
+    <TextView
+        android:id="@+id/textview1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="352dp"
+        android:text="Enter your Phone Number "
+        android:textColor="@color/btn_color"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextNumber2"
+        android:layout_width="50dp"
+        android:layout_height="55dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="56dp"
+        android:ems="10"
+        android:enabled="false"
+        android:inputType="number"
+        android:text="  +91"
+        android:textColor="@color/black"
+        android:background="@drawable/rounded_edittext_background"
+        app:layout_constraintBottom_toBottomOf="@+id/phoneEditTextNumber"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/phoneEditTextNumber"
+        android:layout_width="320dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="148dp"
+        android:background="@drawable/rounded_edittext_background"
+        android:hint="Enter your number"
+        android:inputType="number"
+        android:maxLength="13"
+        android:minEms="13"
+        android:paddingLeft="20dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.384"
+        app:layout_constraintStart_toEndOf="@+id/editTextNumber2"
+        app:layout_constraintTop_toTopOf="@+id/signup"
+        app:prefixText="+91" />
+
+    <Button
+        android:id="@+id/sendOTPBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:backgroundTint="@color/btn_color"
         android:text="Continue"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.63" />
+        app:layout_constraintTop_toBottomOf="@+id/phoneProgressBar"
+        app:layout_constraintVertical_bias="0.076" />
+
+    <ProgressBar
+        android:id="@+id/phoneProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:indeterminateTint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneEditTextNumber" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

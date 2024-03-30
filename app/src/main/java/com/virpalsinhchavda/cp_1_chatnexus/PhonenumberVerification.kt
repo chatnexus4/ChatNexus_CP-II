@@ -1,62 +1,86 @@
 package com.virpalsinhchavda.cp_1_chatnexus
 
-import android.content.Context
+
 import android.content.Intent
-import android.content.SharedPreferences
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthMissingActivityForRecaptchaException
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
-import com.virpalsinhchavda.cp_1_chatnexus.databinding.ActivityPhonenumberVerificationBinding
+import com.google.firebase.auth.*
 import java.util.concurrent.TimeUnit
 
 class PhonenumberVerification : AppCompatActivity() {
-    private lateinit var binding : ActivityPhonenumberVerificationBinding
+
+    private lateinit var sendOTPBtn : Button
+    private lateinit var phoneNumberET : EditText
     private lateinit var auth : FirebaseAuth
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var number: String
+    private lateinit var number : String
+    private lateinit var mProgressBar : ProgressBar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityPhonenumberVerificationBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
-        val numberEditText: EditText = findViewById(R.id.editTextnumber)
-        val myButton: Button = findViewById(R.id.buttonContinue)
-        auth = FirebaseAuth.getInstance()
-        sharedPreferences = getSharedPreferences("login_state", Context.MODE_PRIVATE)
-        // Set the initial background color
-        myButton.setBackgroundColor(Color.parseColor("#FFDDCF51"))
+        setContentView(R.layout.activity_phonenumber_verification)
 
-        // Initialize PrefixTextWatcher
-        val defaultPrefix = "+91" // Replace this with your default prefix
-        numberEditText.addTextChangedListener(PrefixTextWatcher(numberEditText, defaultPrefix))
-
-        number = findViewById<EditText>(R.id.editTextnumber).text.toString()
-        binding.buttonContinue.setOnClickListener {
-
+        init()
+        sendOTPBtn.setOnClickListener {
+            number = phoneNumberET.text.trim().toString()
             if (number.isNotEmpty()){
-                val options = PhoneAuthOptions.newBuilder(auth)
-                    .setPhoneNumber(number) // Phone number to verify
-                    .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-                    .setActivity(this) // Activity (for callback binding)
-                    .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
-                    .build()
-                PhoneAuthProvider.verifyPhoneNumber(options)
+                if (number.length == 10){
+                    number = "+91$number"
+                    mProgressBar.visibility = View.VISIBLE
+                    val options = PhoneAuthOptions.newBuilder(auth)
+                        .setPhoneNumber(number)       // Phone number to verify
+                        .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                        .setActivity(this)                 // Activity (for callback binding)
+                        .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
+                        .build()
+                    PhoneAuthProvider.verifyPhoneNumber(options)
+
+                }else{
+                    Toast.makeText(this , "Please Enter correct Number" , Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                Toast.makeText(this , "Please Enter Number" , Toast.LENGTH_SHORT).show()
+
             }
         }
+    }
+
+    private fun init(){
+        mProgressBar = findViewById(R.id.phoneProgressBar)
+        mProgressBar.visibility = View.INVISIBLE
+        sendOTPBtn = findViewById(R.id.sendOTPBtn)
+        phoneNumberET = findViewById(R.id.phoneEditTextNumber)
+        auth = FirebaseAuth.getInstance()
+    }
+
+    private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Toast.makeText(this , "Authenticate Successfully" , Toast.LENGTH_SHORT).show()
+                    sendToMain()
+                } else {
+                    // Sign in failed, display a message and update the UI
+                    Log.d("TAG", "signInWithPhoneAuthCredential: ${task.exception.toString()}")
+                    if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                        // The verification code entered was invalid
+                    }
+                    // Update UI
+                }
+                mProgressBar.visibility = View.INVISIBLE
+            }
+    }
+
+    private fun sendToMain(){
+        startActivity(Intent(this , MainActivity::class.java))
     }
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
@@ -76,105 +100,37 @@ class PhonenumberVerification : AppCompatActivity() {
 
             if (e is FirebaseAuthInvalidCredentialsException) {
                 // Invalid request
-                Log.d("OnVerificationFailed", "onVerificationFailed: ${e.toString()}")
+                Log.d("TAG", "onVerificationFailed: ${e.toString()}")
             } else if (e is FirebaseTooManyRequestsException) {
                 // The SMS quota for the project has been exceeded
-                Log.d("OnVerificationFailed", "TooManyRequestException: ${e.toString()}")
-            } else if (e is FirebaseAuthMissingActivityForRecaptchaException) {
-                // reCAPTCHA verification attempted with null Activity
+                Log.d("TAG", "onVerificationFailed: ${e.toString()}")
             }
-
+            mProgressBar.visibility = View.VISIBLE
             // Show a message and update the UI
         }
 
         override fun onCodeSent(
             verificationId: String,
-            token: PhoneAuthProvider.ForceResendingToken,
+            token: PhoneAuthProvider.ForceResendingToken
         ) {
             // The SMS verification code has been sent to the provided phone number, we
             // now need to ask the user to enter the code and then construct a credential
             // by combining the code with a verification ID.
-
-            // Save verification ID and resending token so we can use them later\
-            val intent = Intent(this@PhonenumberVerification,verification::class.java)
-            intent.putExtra("OTP",verificationId)
-            intent.putExtra("resendToken",token)
-            intent.putExtra("phoneNumber",number)
+            // Save verification ID and resending token so we can use them later
+            val intent = Intent(this@PhonenumberVerification , VerificationActivity::class.java)
+            intent.putExtra("OTP" , verificationId)
+            intent.putExtra("resendToken" , token)
+            intent.putExtra("phoneNumber" , number)
             startActivity(intent)
+            mProgressBar.visibility = View.INVISIBLE
         }
     }
+
 
     override fun onStart() {
         super.onStart()
         if (auth.currentUser != null){
-            val editor = sharedPreferences.edit()
-            editor.putBoolean("isLoggedIn", true)
-            editor.apply()
-
-            // Go to main activity
-            startActivity(MainActivity.getIntent(this))
-            finish()
+            startActivity(Intent(this , MainActivity::class.java))
         }
     }
-    private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Toast.makeText(this,"Authentication Successfull",Toast.LENGTH_LONG).show()
-                    login()
-                } else {
-                    // Sign in failed, display a message and update the UI
-                        Log.d("singinwithphoneauthcredential", "signInWithPhoneAuthCredential: ${task.exception.toString()}")
-                    if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                        // The verification code entered was invalid
-                    }
-                    // Update UI
-                }
-            }
-    }
-    private fun login() {
-        // Perform login authentication
-
-        // Once logged in successfully, set isLoggedIn to true
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("isLoggedIn", true)
-        editor.apply()
-
-        // Go to main activity
-        startActivity(MainActivity.getIntent(this))
-        finish() // Prevents user from going back to LoginActivity
-    }
-    // navigate to the Verification activity if valid
-    private fun navigateToVerificationActivity() {
-        val intent = Intent(this, verification::class.java)
-        startActivity(intent)
-
-    }
-}
-class PrefixTextWatcher(private val editText: EditText, private val defaultPrefix: String) :
-    TextWatcher {
-    private var isEditing = false
-
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        // No action needed
-    }
-
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        // No action needed
-    }
-
-    override fun afterTextChanged(editable: Editable?) {
-        if (isEditing) return
-        isEditing = true
-
-        val text = editable.toString()
-        if (!text.startsWith(defaultPrefix)) {
-            editText.setText(defaultPrefix)
-            editText.setSelection(defaultPrefix.length) // Place cursor at the end
-        }
-
-        isEditing = false
-    }
-
 }
