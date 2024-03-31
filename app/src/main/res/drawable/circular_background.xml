@@ -1,0 +1,16 @@
+<!-- circular_background.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Circular border -->
+    <item>
+        <shape android:shape="oval">
+            <stroke
+                android:width="2dp"
+                android:color="#F1E472" /> <!-- Border color -->
+        </shape>
+    </item>
+    <item android:drawable="@drawable/add_a_photo"
+        android:width="80dp"
+        android:height="80dp"
+        android:gravity="center"
+        android:tint="#D9D9D9" />
+</layer-list>
