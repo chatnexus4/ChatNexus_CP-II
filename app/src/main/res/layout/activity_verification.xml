@@ -8,6 +8,7 @@
     android:background="@drawable/chatnexus_bg">
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Verify OTP"
@@ -24,12 +25,15 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
         android:text="Enter 6 digit otp sent to your phone"
         android:textColor="@color/btn_color"
         android:textSize="15sp"
         android:textStyle="bold"
-        tools:layout_editor_absoluteX="88dp"
-        tools:layout_editor_absoluteY="307dp" />
+        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
         android:id="@+id/verifyOTPBtn"
@@ -95,9 +99,9 @@
         android:layout_height="45dp"
         android:background="@drawable/rounded_edittext_background"
         android:ems="10"
-        android:inputType="number"
         android:gravity="center"
         android:hint="0"
+        android:inputType="number"
         android:textColor="@android:color/black"
         app:layout_constraintBottom_toTopOf="@+id/guideline5"
         app:layout_constraintEnd_toStartOf="@+id/otpEditText4"

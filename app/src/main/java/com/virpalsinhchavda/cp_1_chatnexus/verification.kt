@@ -1,5 +1,6 @@
 package com.virpalsinhchavda.cp_1_chatnexus
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -149,7 +150,7 @@ class VerificationActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Toast.makeText(this, "Authenticate Successfully", Toast.LENGTH_SHORT).show()
-                    sendToMain()
+                    sendToUsername()
                 } else {
                     // Sign in failed, display a message and update the UI
                     Log.d("TAG", "signInWithPhoneAuthCredential: ${task.exception.toString()}")
@@ -167,8 +168,8 @@ class VerificationActivity : AppCompatActivity() {
     }
 
 
-    private fun sendToMain() {
-        startActivity(Intent(this, MainActivity::class.java))
+    private fun sendToUsername() {
+        startActivity(Intent(this, Username::class.java))
     }
 
     private fun addTextChangeListener() {
