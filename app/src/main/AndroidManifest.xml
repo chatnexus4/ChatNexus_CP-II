@@ -14,6 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CP1_ChatNexus"
         tools:targetApi="31">
+        <activity
+            android:name=".homepage_message"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.actions"
             android:resource="@xml/circle_image_shadow" />
