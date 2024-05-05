@@ -3,43 +3,50 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="ChatNexus"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CP1_ChatNexus"
         tools:targetApi="31">
         <activity
-            android:name=".homepage_message"
+            android:name=".Contacts"
+            android:exported="false"
+            />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"> <!-- Set exported to true for the launcher activity -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter> >
+        </activity>
+        <activity
+            android:name=".homepage_call"
             android:exported="false" />
-
-        <meta-data
-            android:name="com.google.android.actions"
-            android:resource="@xml/circle_image_shadow" />
+        <activity
+            android:name=".setting"
+            android:exported="false" />
 
         <activity
             android:name=".Username"
-            android:exported="false" />
-        <activity
-            android:name=".VerificationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PhonenumberVerification"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="false">
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:exported="true" />
+            android:name=".VerificationActivity"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".PhonenumberVerification"
+            android:exported="true"> <!-- Set exported to true for the launcher activity -->
+        </activity>
+
     </application>
 
 </manifest>

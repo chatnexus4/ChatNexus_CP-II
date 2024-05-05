@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
+import com.google.firebase.database.FirebaseDatabase
 import java.util.concurrent.TimeUnit
 
 class PhonenumberVerification : AppCompatActivity() {
@@ -66,7 +67,7 @@ class PhonenumberVerification : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Toast.makeText(this , "Authenticate Successfully" , Toast.LENGTH_SHORT).show()
-                    sendToMain()
+                    sendToVerification()
                 } else {
                     // Sign in failed, display a message and update the UI
                     Log.d("TAG", "signInWithPhoneAuthCredential: ${task.exception.toString()}")
@@ -79,9 +80,21 @@ class PhonenumberVerification : AppCompatActivity() {
             }
     }
 
-    private fun sendToMain(){
-        startActivity(Intent(this , MainActivity::class.java))
+    private fun sendToVerification() {
+        // Store the phone number in the Firebase Realtime Database
+        val currentUser = auth.currentUser
+        currentUser?.let {
+            val userId = currentUser.uid
+            val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+            userRef.child("phoneNumber").setValue(number)
+        }
+
+        // Navigate to the VerificationActivity
+        val intent = Intent(this, VerificationActivity::class.java)
+        intent.putExtra("phoneNumber", number)
+        startActivity(intent)
     }
+
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
         override fun onVerificationCompleted(credential: PhoneAuthCredential) {

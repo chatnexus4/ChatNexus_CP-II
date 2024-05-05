@@ -1,21 +1,26 @@
 package com.virpalsinhchavda.cp_1_chatnexus
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthOptions
+import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.database.FirebaseDatabase
 import java.util.concurrent.TimeUnit
 
+
+@Suppress("DEPRECATION")
 class VerificationActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var verifyBtn: Button
@@ -27,14 +32,16 @@ class VerificationActivity : AppCompatActivity() {
     private lateinit var inputOTP5: EditText
     private lateinit var inputOTP6: EditText
     private lateinit var progressBar: ProgressBar
-
     private lateinit var OTP: String
-    private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
     private lateinit var phoneNumber: String
+    private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
+    private var countDown: Int = 60
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verification)
+
+        auth = FirebaseAuth.getInstance()
 
         OTP = intent.getStringExtra("OTP").toString()
         resendToken = intent.getParcelableExtra("resendToken")!!
@@ -49,18 +56,16 @@ class VerificationActivity : AppCompatActivity() {
             resendVerificationCode()
             resendOTPTvVisibility()
         }
+        resendTV.text = getString(R.string.resend_otp_countdown, countDown)
 
         verifyBtn.setOnClickListener {
-            //collect otp from all the edit texts
-            val typedOTP =
-                (inputOTP1.text.toString() + inputOTP2.text.toString() + inputOTP3.text.toString()
-                        + inputOTP4.text.toString() + inputOTP5.text.toString() + inputOTP6.text.toString())
+            val typedOTP = (inputOTP1.text.toString() + inputOTP2.text.toString() +
+                    inputOTP3.text.toString() + inputOTP4.text.toString() +
+                    inputOTP5.text.toString() + inputOTP6.text.toString())
 
             if (typedOTP.isNotEmpty()) {
                 if (typedOTP.length == 6) {
-                    val credential: PhoneAuthCredential = PhoneAuthProvider.getCredential(
-                        OTP, typedOTP
-                    )
+                    val credential: PhoneAuthCredential = PhoneAuthProvider.getCredential(OTP, typedOTP)
                     progressBar.visibility = View.VISIBLE
                     signInWithPhoneAuthCredential(credential)
                 } else {
@@ -71,10 +76,8 @@ class VerificationActivity : AppCompatActivity() {
             }
         }
 
-        // Set focus on the first EditText when the activity starts
         inputOTP1.requestFocus()
     }
-
 
     private fun resendOTPTvVisibility() {
         inputOTP1.setText("")
@@ -86,10 +89,26 @@ class VerificationActivity : AppCompatActivity() {
         resendTV.visibility = View.INVISIBLE
         resendTV.isEnabled = false
 
-        Handler(Looper.myLooper()!!).postDelayed(Runnable {
-            resendTV.visibility = View.VISIBLE
-            resendTV.isEnabled = true
-        }, 60000)
+        // Start the resend countdown
+        startResendCountdown()
+    }
+
+    private fun startResendCountdown() {
+        val handler = Handler(Looper.myLooper()!!)
+        val runnable = object : Runnable {
+            override fun run() {
+                if (countDown > 0) {
+                    resendTV.text = getString(R.string.resend_otp_countdown, countDown)
+                    countDown--
+                    handler.postDelayed(this, 1000) // Run every second
+                } else {
+                    resendTV.visibility = View.VISIBLE
+                    resendTV.isEnabled = true
+                    resendTV.text = "Resend OTP"
+                }
+            }
+        }
+        handler.post(runnable)
     }
 
     private fun resendVerificationCode() {
@@ -104,72 +123,54 @@ class VerificationActivity : AppCompatActivity() {
     }
 
     private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-
         override fun onVerificationCompleted(credential: PhoneAuthCredential) {
             // This callback will be invoked in two situations:
-            // 1 - Instant verification. In some cases the phone number can be instantly
-            //     verified without needing to send or enter a verification code.
-            // 2 - Auto-retrieval. On some devices Google Play services can automatically
-            //     detect the incoming verification SMS and perform verification without
-            //     user action.
+            // 1 - Instant verification.
+            // 2 - Auto-retrieval.
             signInWithPhoneAuthCredential(credential)
         }
 
         override fun onVerificationFailed(e: FirebaseException) {
-            // This callback is invoked in an invalid request for verification is made,
-            // for instance if the the phone number format is not valid.
-
             if (e is FirebaseAuthInvalidCredentialsException) {
                 // Invalid request
-                Log.d("TAG", "onVerificationFailed: ${e.toString()}")
             } else if (e is FirebaseTooManyRequestsException) {
                 // The SMS quota for the project has been exceeded
-                Log.d("TAG", "onVerificationFailed: ${e.toString()}")
             }
-            progressBar.visibility = View.VISIBLE
-            // Show a message and update the UI
         }
 
-        override fun onCodeSent(
-            verificationId: String,
-            token: PhoneAuthProvider.ForceResendingToken
-        ) {
-            // The SMS verification code has been sent to the provided phone number, we
-            // now need to ask the user to enter the code and then construct a credential
-            // by combining the code with a verification ID.
-            // Save verification ID and resending token so we can use them later
+        override fun onCodeSent(verificationId: String, token: PhoneAuthProvider.ForceResendingToken) {
             OTP = verificationId
             resendToken = token
         }
     }
 
     private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
-        progressBar.visibility = View.VISIBLE // Show progress bar when sign-in process starts
+        progressBar.visibility = View.VISIBLE
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Toast.makeText(this, "Authenticate Successfully", Toast.LENGTH_SHORT).show()
+                    // Sign in success
+                    val user = auth.currentUser
+                    val uid = user?.uid
+
+                    // Store phone number in Firebase Realtime Database under 'phonenumber' branch
+                    uid?.let { userId ->
+                        val userRef = FirebaseDatabase.getInstance().reference.child("users").child(phoneNumber)
+                        userRef.child("phonenumber").setValue(phoneNumber) // Store phone number
+                    }
+
+                    // Redirect to the Username activity
                     sendToUsername()
                 } else {
-                    // Sign in failed, display a message and update the UI
-                    Log.d("TAG", "signInWithPhoneAuthCredential: ${task.exception.toString()}")
-                    if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                        // The verification code entered was invalid
-                        Toast.makeText(this, "Invalid OTP", Toast.LENGTH_SHORT).show()
-                    } else {
-                        // Other errors
-                        Toast.makeText(this, "Sign-in failed. Please try again.", Toast.LENGTH_SHORT).show()
-                    }
-                    // Update UI
+                    // Sign in failed
+                    Toast.makeText(this, "Sign-in failed. Please try again.", Toast.LENGTH_SHORT).show()
                     progressBar.visibility = View.INVISIBLE // Hide progress bar on sign-in failure
                 }
             }
     }
 
-
     private fun sendToUsername() {
-        startActivity(Intent(this, Username::class.java))
+        startActivity(Intent(this, MessageActivity::class.java))
     }
 
     private fun addTextChangeListener() {
@@ -182,10 +183,9 @@ class VerificationActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        auth = FirebaseAuth.getInstance()
-        progressBar = findViewById(R.id.otpProgressBar)
         verifyBtn = findViewById(R.id.verifyOTPBtn)
         resendTV = findViewById(R.id.resendTextView)
+        progressBar = findViewById(R.id.otpProgressBar)
         inputOTP1 = findViewById(R.id.otpEditText1)
         inputOTP2 = findViewById(R.id.otpEditText2)
         inputOTP3 = findViewById(R.id.otpEditText3)
@@ -239,7 +239,7 @@ class VerificationActivity : AppCompatActivity() {
                     if (text.isEmpty() && p0.isNullOrEmpty()) {
                         inputOTP5.requestFocus()
                     } else if (text.length == 1) {
-                        inputOTP6.clearFocus() // Clear focus to prevent further input
+                        inputOTP6.clearFocus()
                     }
                 }
             }
